@@ -78,13 +78,71 @@
             </div>
 
             @if($attendances->hasPages())
-            <div class="card-footer bg-white d-flex justify-content-center py-3">
-                {{ $attendances->links() }}
+            <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+                <div class="text-muted small">
+                    Menampilkan {{ $attendances->firstItem() }} sampai {{ $attendances->lastItem() }} dari {{ $attendances->total() }} data
+                </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        {{-- Previous Page Link --}}
+                        @if($attendances->onFirstPage())
+                            <li class="page-item disabled">
+                                <span class="page-link">&laquo;</span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $attendances->previousPageUrl() }}" rel="prev">&laquo;</a>
+                            </li>
+                        @endif
+
+                        {{-- Pagination Elements --}}
+                        @foreach($attendances->getUrlRange(1, $attendances->lastPage()) as $page => $url)
+                            <li class="page-item {{ $page == $attendances->currentPage() ? 'active' : '' }}">
+                                <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                            </li>
+                        @endforeach
+
+                        {{-- Next Page Link --}}
+                        @if($attendances->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $attendances->nextPageUrl() }}" rel="next">&raquo;</a>
+                            </li>
+                        @else
+                            <li class="page-item disabled">
+                                <span class="page-link">&raquo;</span>
+                            </li>
+                        @endif
+                    </ul>
+                </nav>
             </div>
             @endif
         </div>
     </div>
 </div>
+@endsection
+
+@section('styles')
+<style>
+    .pagination {
+        margin-bottom: 0;
+    }
+    .page-item.active .page-link {
+        background-color: #3498db;
+        border-color: #3498db;
+    }
+    .page-link {
+        color: #3498db;
+        padding: 0.375rem 0.75rem;
+    }
+    .page-item:first-child .page-link {
+        border-top-left-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
+    }
+    .page-item:last-child .page-link {
+        border-top-right-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
+    }
+</style>
 @endsection
 
 @section('scripts')

@@ -166,11 +166,17 @@ class AttendanceController extends Controller
         return Excel::download(new AttendanceLogsExport($attendance), $filename);
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');
+        
         $attendances = Attendance::withCount('logs')
+            ->when($search, function($query) use ($search) {
+                return $query->where('title', 'like', "%{$search}%");
+            })
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(5)
+            ->withQueryString();
 
         return view('attendance.index', compact('attendances'));
     }
