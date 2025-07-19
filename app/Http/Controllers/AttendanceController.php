@@ -153,7 +153,7 @@ class AttendanceController extends Controller
                 });
             })
             ->orderBy('scan_time', 'desc')
-            ->paginate(20)
+            ->paginate(5)
             ->withQueryString();
 
         return view('attendance.logs', compact('attendance', 'logs'));

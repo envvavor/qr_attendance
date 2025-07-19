@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container py-4">
+    <!-- Header section remains the same -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
         <div>
             <h1 class="h3 fw-bold text-primary mb-1">出席リスト</h1>
@@ -23,6 +24,7 @@
 
     <div class="card border-0 shadow-sm">
         <div class="card-body">
+            <!-- Search and info section remains the same -->
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
                 <div class="text-muted small">
                     <i class="fas fa-users me-1"></i> 参加者合計: <strong>{{ $logs->total() }}</strong>
@@ -44,6 +46,7 @@
                 </form>
             </div>
 
+            <!-- Table remains the same -->
             <div class="table-responsive">
                 <table class="table table-striped align-middle text-nowrap">
                     <thead class="table-light">
@@ -92,12 +95,104 @@
                 </table>
             </div>
 
+            <!-- Custom Pagination - Added directly here -->
             @if($logs->hasPages())
-            <div class="d-flex justify-content-center mt-3">
-                {{ $logs->withQueryString()->links() }}
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="text-muted small">
+                    表示中: {{ $logs->firstItem() }} - {{ $logs->lastItem() }} / 全{{ $logs->total() }}件
+                </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        {{-- Previous Page Link --}}
+                        @if($logs->onFirstPage())
+                            <li class="page-item disabled">
+                                <span class="page-link px-3">&laquo;</span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link px-3" href="{{ $logs->previousPageUrl() }}" rel="prev">&laquo;</a>
+                            </li>
+                        @endif
+
+                        {{-- Pagination Elements --}}
+                        @php
+                            // Show limited page numbers
+                            $start = max(1, $logs->currentPage() - 2);
+                            $end = min($logs->lastPage(), $logs->currentPage() + 2);
+                        @endphp
+
+                        @if($start > 1)
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $logs->url(1) }}">1</a>
+                            </li>
+                            @if($start > 2)
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            @endif
+                        @endif
+
+                        @for($i = $start; $i <= $end; $i++)
+                            <li class="page-item {{ $i == $logs->currentPage() ? 'active' : '' }}">
+                                <a class="page-link" href="{{ $logs->url($i) }}">{{ $i }}</a>
+                            </li>
+                        @endfor
+
+                        @if($end < $logs->lastPage())
+                            @if($end < $logs->lastPage() - 1)
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            @endif
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $logs->url($logs->lastPage()) }}">{{ $logs->lastPage() }}</a>
+                            </li>
+                        @endif
+
+                        {{-- Next Page Link --}}
+                        @if($logs->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link px-3" href="{{ $logs->nextPageUrl() }}" rel="next">&raquo;</a>
+                            </li>
+                        @else
+                            <li class="page-item disabled">
+                                <span class="page-link px-3">&raquo;</span>
+                            </li>
+                        @endif
+                    </ul>
+                </nav>
             </div>
             @endif
         </div>
     </div>
 </div>
+@endsection
+
+@section('styles')
+<style>
+    .pagination {
+        margin-bottom: 0;
+    }
+    .page-item.active .page-link {
+        background-color: #3498db;
+        border-color: #3498db;
+    }
+    .page-link {
+        color: #3498db;
+        min-width: 38px;
+        text-align: center;
+    }
+    .page-item.disabled .page-link {
+        color: #6c757d;
+    }
+</style>
+@endsection
+
+@section('scripts')
+<script>
+    // Tooltip initialization remains the same
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+        new bootstrap.Tooltip(el);
+    });
+</script>
 @endsection
