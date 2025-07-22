@@ -13,7 +13,6 @@ Route::prefix('attendance')->group(function () {
     Route::get('/{attendance}', [AttendanceController::class, 'show'])->name('attendance.show');
     Route::get('/{attendance}/scan', [AttendanceController::class, 'scan'])->name('attendance.scan');
     Route::post('/{attendance}/process', [AttendanceController::class, 'processAttendance'])->name('attendance.process');
-    Route::get('/attendance/{attendance}/scan', [AttendanceController::class, 'scan'])->name('attendance.scan');
     Route::get('/attendance/{attendance}/scan-form', [AttendanceController::class, 'scanForm'])->name('attendance.scan-form');
     Route::get('/attendances/{attendance}/logs', [AttendanceController::class, 'logs'])->name('attendance.logs');
     Route::get('/attendances/{attendance}/export', [AttendanceController::class, 'export'])->name('attendance.export');
