@@ -16,14 +16,27 @@
             <a href="{{ route('attendance.show', $attendance->id) }}" class="btn btn-outline-primary">
                 <i class="fas fa-arrow-left me-1"></i> 戻る
             </a>
-            <a href="{{ route('attendance.export', $attendance->id) }}" class="btn btn-success">
-                <i class="fas fa-file-excel me-1"></i> エクセルでエクスポート
-            </a>
+            <form method="GET" action="{{ route('attendance.export', $attendance->id) }}" class="d-inline form-export-excel">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-file-excel me-1"></i> エクセルでエクスポート
+                </button>
+            </form>
         </div>
     </div>
 
     <div class="card border-0 shadow-sm">
         <div class="card-body">
+            <!-- Tombol Hapus Semua -->
+            @if($logs->count() > 0)
+            <div class="mb-3 d-flex justify-content-end">
+                <form method="POST" action="{{ route('attendance.deleteAllLogs', $attendance->id) }}" class="form-delete-all">
+                    @csrf
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash-alt me-1"></i> すべて削除
+                    </button>
+                </form>
+            </div>
+            @endif
             <!-- Search and info section remains the same -->
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
                 <div class="text-muted small">
@@ -56,6 +69,7 @@
                             <th>氏名</th>
                             <th class="text-center">出席時間</th>
                             <th class="text-center">ステータス</th>
+                            <th class="text-end">アクション</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -75,10 +89,18 @@
                                 <span class="badge bg-warning text-dark">遅刻</span>
                                 @endif
                             </td>
+                            <td class="text-end">
+                                <form method="POST" action="{{ route('attendance.deleteLog', [$attendance->id, $log->id]) }}" style="display:inline;" class="form-delete-log">
+                                    @csrf
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="削除">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center py-4">
+                            <td colspan="7" class="text-center py-4">
                                 <i class="fas fa-user-slash fa-2x text-muted mb-2"></i><br>
                                 <span class="text-muted">出席データがありません</span>
                                 @if(request('search'))
@@ -189,10 +211,96 @@
 @endsection
 
 @section('scripts')
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Tooltip initialization remains the same
     document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
         new bootstrap.Tooltip(el);
     });
+
+    // SweetAlert konfirmasi hapus satu log
+    document.querySelectorAll('.form-delete-log').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: '本当に削除しますか？',
+                text: 'この出席ログを削除します。',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'はい、削除',
+                cancelButtonText: 'キャンセル'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+    // SweetAlert konfirmasi hapus semua log
+    document.querySelectorAll('.form-delete-all').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'すべて削除しますか？',
+                text: 'すべての出席ログを削除します。',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'はい、削除',
+                cancelButtonText: 'キャンセル'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // SweetAlert konfirmasi export excel
+    document.querySelectorAll('.form-export-excel').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'エクスポートしますか？',
+                text: '出席データをエクセルでエクスポートします。',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#aaa',
+                confirmButtonText: 'はい',
+                cancelButtonText: 'キャンセル'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: '成功',
+            text: @json(session('success')),
+            confirmButtonColor: '#3085d6',
+            timer: 2000,
+            timerProgressBar: true,
+            showConfirmButton: false
+        });
+    @endif
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'エラー',
+            text: @json(session('error')),
+            confirmButtonColor: '#d33',
+            timer: 2500,
+            timerProgressBar: true,
+            showConfirmButton: false
+        });
+    @endif
 </script>
 @endsection

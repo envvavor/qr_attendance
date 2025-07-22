@@ -191,4 +191,36 @@ class AttendanceController extends Controller
             ->with('name', $data['name'] ?? '')
             ->with('scan_time', now()->format('Y-m-d H:i:s'));
     }
+
+    public function deleteLog(Attendance $attendance, $logId)
+    {
+        $log = $attendance->logs()->where('id', $logId)->first();
+
+        if (!$log) {
+            return back()->with([
+                'error' => '出席ログが見つかりません',
+                'confirm' => false,
+            ]);
+        }
+
+        $log->delete();
+
+        return back()->with([
+            'success' => '出席ログを削除しました',
+            'confirm' => true,
+            'confirm_message' => '本当にこの出席ログを削除しました。',
+        ]);
+    }
+
+    public function deleteAllLogs(Attendance $attendance)
+    {
+        $attendance->logs()->delete();
+
+        return back()->with([
+            'success' => 'すべての出席ログを削除しました',
+            'confirm' => true,
+            'confirm_message' => '本当にすべての出席ログを削除しました。',
+        ]);
+    }
+
 }

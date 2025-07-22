@@ -17,6 +17,8 @@ Route::prefix('attendance')->group(function () {
     Route::get('/attendance/{attendance}/scan-form', [AttendanceController::class, 'scanForm'])->name('attendance.scan-form');
     Route::get('/attendances/{attendance}/logs', [AttendanceController::class, 'logs'])->name('attendance.logs');
     Route::get('/attendances/{attendance}/export', [AttendanceController::class, 'export'])->name('attendance.export');
+    Route::post('/attendances/{attendance}/logs/{logId}/delete', [AttendanceController::class, 'deleteLog'])->name('attendance.deleteLog');
+    Route::post('/attendances/{attendance}/logs/delete-all', [AttendanceController::class, 'deleteAllLogs'])->name('attendance.deleteAllLogs');
 });
 
 // Hapus route yang salah dan ganti dengan ini:
